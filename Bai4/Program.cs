@@ -68,8 +68,6 @@ namespace Bai4
                         product[i] = product[j];
                         product[j] = pro1;
                     }
-                    
-
                 }
             }
             for(int i=0;i<product.Length;i++)
@@ -85,7 +83,7 @@ namespace Bai4
             {
                 Product val = product[i];
                 int pos = i;
-                while(pos>0 && product[pos-1].name.Count()<val.name.Count())
+                while(pos>0 && product[pos-1].name.Length<val.name.Length)
                 {
                     product[pos]=product[pos-1];
                     pos--;
@@ -101,21 +99,23 @@ namespace Bai4
         static List<Product> sortByCategoryName(Product[] product,Category[] categories)
         {
             List<Product> listpro = new List<Product>();
-            //int temp;
-            for (int i = 1; i < product.Length; i++)
+            int temp;
+            for (int i = 0; i < product.Length; i++)
             {
-                Product currentProduct = product[i];
-                int pos = i;
-                string categoryNameCurrent = GetCategoryById(currentProduct.categoryId, categories);
-                string categoryNamePost = GetCategoryById(product[pos - 1].categoryId, categories);
-                while (pos > 0 && categoryNamePost.CompareTo(categoryNameCurrent) > 0)
+                for (int j = i + 1; j < product.Length; j++)
                 {
-                    product[pos] = product[pos - 1];
-                    pos--;
+                    string categoryNameCurrent = GetCategoryById(product[j].categoryId, categories);
+                    string categoryNamePost = GetCategoryById(product[i].categoryId, categories);
+                    if (categoryNamePost.CompareTo(categoryNameCurrent) > 0)
+                    {
+                        if (categoryNamePost == null)
+                            break;
+                        temp = product[i].categoryId;
+                        product[i].categoryId = product[j].categoryId;
+                        product[j].categoryId = temp;
+                    }
                 }
-                product[pos] = currentProduct;
             }
-
             for (int i = 0; i < product.Length; i++)
             {
                 listpro.Add(product[i]);
@@ -124,18 +124,88 @@ namespace Bai4
         }
         static string GetCategoryById(int categoryId,Category[] categories)
         {
-            //string name= " ";
             for(int i=0;i< categories.Length;i++)
             {
-                if(categoryId==categories[i].categoryId)
+                if (categoryId == categories[i].categoryId)
                 {
                     return categories[i].name;
                 }
-                
             }
             return null;
         }
+        static List<Product> mapProductByCategory(Product[] product, Category[] categories)
+        {
+            List<Product> listpro = new List<Product>();
+            for(int i=0;i<product.Length;i++)
+            {
+                listpro.Add(product[i]);
+            }
+            return listpro;
+        }
+        static Product minbyPrice(Product[] product)
+        {
+            Product min = new Product();
+            min = product[0];
+            for (int i = 0; i < product.Length; i++)
+            {
+                if (min.price > product[i].price)
+                {
+                    min = product[i];
+                }
+
+            }
+            return min;
+        }
+        static Product maxbyPrice(Product[] product)
+        {
+            Product max = new Product();
+            max = product[0];
+            for (int i = 0; i < product.Length; i++)
+            {
+                if (max.price < product[i].price)
+                {
+                    max = product[i];
+                }
+
+            }
+            return max;
+        }
+        static float calSalary(float salary, float n)
+        {
+            if (n == 0)
+            {
+                return salary;
+            }
+            return calSalary(salary, n - 1) * 110 / 100;
+        }
+        static float calSalaryBasic(float salary,float n)
+        {
+            
+            for(int i=0;i<n;i++)
+            {
+                salary = salary + salary / 10;
+                n--;
+            }
+            return salary;
+        }
         
+        static int calMonth(float money,float rate, int month=0)
+
+        {
+            if(rate*month*money/100>=money)
+            {
+                return month;
+            }
+            else return calMonth(money,rate,month+1);
+            
+        }
+        static int calMonthBasic(float money,float rate)
+        {
+            float interest = money * rate / 100;
+            float month = money / interest;
+
+            return Convert.ToInt32(month);
+        }
         public static void Main(string[] args)
         {
             //Console.WriteLine("Hello World");
@@ -186,7 +256,7 @@ namespace Bai4
 
             for (int i = 0; i < prodcategory.Count; i++)
             {
-                Console.WriteLine("Ten :"+prodcategory[i].name + " Gia :" + prodcategory[i].price + "SLuong: " + prodcategory[i].quality);
+                Console.WriteLine("Ten :" + prodcategory[i].name + " Gia :" + prodcategory[i].price + "SLuong: " + prodcategory[i].quality);
                 //    if(id==categoryId[i])
                 //    {
 
@@ -197,49 +267,83 @@ namespace Bai4
                 //        Console.WriteLine(product[i].quality);
                 //    }
             }
-            
-
-
-
             Console.WriteLine("Nhap gia: ");
             List<Product> prodprice = new List<Product>();
-            int price1= Convert.ToInt32(Console.ReadLine());
+            int price1 = Convert.ToInt32(Console.ReadLine());
             prodprice = findProductByPrice(product, price1);
             for (int i = 0; i < prodprice.Count; i++)
             {
-                Console.WriteLine("Ten: "+prodprice[i].name);
-                //    Console.WriteLine();
-                //    if (product[i].price <= price1)
-                //    {
-                //        Console.WriteLine("Gia: "+ product[i].price);
-                //    }
+                Console.WriteLine("Ten: " + prodprice[i].name);
+                //Console.WriteLine();
+                //if (product[i].price <= price1)
+                //{
+                //    Console.WriteLine("Gia: " + product[i].price);
+                //}
             }
             Console.ReadKey();
-            List<Product> sortByRice=new List<Product>();
-            sortByRice = SortByRice(product);
-            for(int i=0; i < sortByRice.Count; i++)
-            {
-                Console.WriteLine(sortByRice[i].name+ " "+sortByRice[i].price);
-            }
-            Console.ReadKey();
-            List<Product> SortName=new List<Product>();
-            SortName=sortByName(product);
-            for(int i=0;i<SortName.Count; i++)
-            {
-                Console.WriteLine(SortName[i].name);
-            }
-            Console.ReadKey();
+            //List<Product> sortByRice = new List<Product>();
+            //sortByRice = SortByRice(product);
+            //for (int i = 0; i < sortByRice.Count; i++)
+            //{
+            //    Console.WriteLine(sortByRice[i].name + " " + sortByRice[i].price);
+            //}
+            //Console.ReadKey();
+            //List<Product> SortName = new List<Product>();
+            //SortName = sortByName(product);
+            //for (int i = 0; i < SortName.Count; i++)
+            //{
+            //    Console.WriteLine(SortName[i].name);
+            //}
+            //Console.ReadKey();
             List<Product> sortbyCategoryName = new List<Product>();
-            sortbyCategoryName = sortByCategoryName(product,categories);
+            sortbyCategoryName = sortByCategoryName(product, categories);
             Console.WriteLine("Sort By Category name");
             for(int i=0;i<sortbyCategoryName.Count; i++)
             {
                 Console.WriteLine(sortbyCategoryName[i].name+ " "+sortbyCategoryName[i].categoryId);
-                
             }
+            List<Product> sortByProName = new List<Product>();
+            sortByProName = mapProductByCategory(product, categories);
+            Console.WriteLine("Map By Category name");
+            for(int i=0;i<sortByProName.Count;i++)
+            {
+                string getcategoryName = GetCategoryById(product[i].categoryId, categories);
+                Console.WriteLine(sortByProName[i].name+ " "+getcategoryName);
+            }    
+            Console.ReadKey();
+            Product minPro = new Product();
+            minPro = minbyPrice(product);
+            Console.WriteLine("Min price: " + minPro.price + " " + minPro.name);
+            Product maxPro = new Product();
+            maxPro = maxbyPrice(product);
+            Console.WriteLine("Max price: " + maxPro.price + " " + maxPro.name);
+            Console.ReadKey();
+            float money, month, moneybasic, monthbasic;
+            Console.Write("Nhap so tien luong : ");
+            float salary = Convert.ToInt32(Console.ReadLine());
+            Console.Write("So nam : ");
+            int years = Convert.ToInt32(Console.ReadLine());
+            Console.WriteLine(calSalary(salary, years));
+            Console.Write("Nhap so tien luong : ");
+            float salarybasic = Convert.ToInt32(Console.ReadLine());
+            Console.Write("So nam : ");
+            int yearsbasic = Convert.ToInt32(Console.ReadLine());
+            Console.WriteLine(calSalaryBasic(salary, years));
+            Console.WriteLine("Nhap so tien: ");
+            money = float.Parse(Console.ReadLine());
+            Console.Write("Nhap lai suat : ");
+            float rate = Convert.ToInt32(Console.ReadLine());
+            Console.WriteLine("Nhap thang: ");
+            month = float.Parse(Console.ReadLine());
+            Console.WriteLine(calMonth(money, rate) + " month");
+            Console.WriteLine("Nhap so tien: ");
+            moneybasic = Convert.ToInt32(Console.ReadLine());
+            Console.Write("Nhap lai suat : ");
+            float ratebasic = Convert.ToInt32(Console.ReadLine());
+            Console.WriteLine("Nhap so thang: ");
+            monthbasic = Convert.ToInt32(Console.ReadLine());
+            Console.WriteLine(calMonthBasic(money, rate) + " month");
             Console.ReadKey();
         }
-        
-
     }
 }
