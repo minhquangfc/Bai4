@@ -44,20 +44,20 @@ namespace Bai4
         }
         static List<Product> findProductByPrice(Product[] product,int price)
         {
-            List <Product> list = new List<Product>();
+            List <Product> listproduct = new List<Product>();
             for(int i=0;i<product.Length;i++)
             {
                 if (product[i].price <= price)
                 {
-                    list.Add(product [i]);
+                    listproduct.Add(product [i]);
                 }
             }
-            return list;
+            return listproduct;
         }
         static List<Product> SortByRice(Product[] product)
         {
             Product pro1;
-            List<Product> list = new List<Product>();
+            List<Product> listproduct = new List<Product>();
             for(int i=0;i<product.Length;i++)
             {
                 for(int j=i+1;j<product.Length;j++)
@@ -72,13 +72,13 @@ namespace Bai4
             }
             for(int i=0;i<product.Length;i++)
             {
-                list.Add(product[i]);
+                listproduct.Add(product[i]);
             }
-            return list;
+            return listproduct;
         }
         static List<Product> sortByName(Product[] product)
         {
-            List<Product> list = new List<Product>();
+            List<Product> listproduct = new List<Product>();
             for(int i=1;i<product.Length;i++)
             {
                 Product val = product[i];
@@ -92,13 +92,13 @@ namespace Bai4
             }
             for(int i=0;i<product.Length;i++)
             {
-                list.Add(product[i]);
+                listproduct.Add(product[i]);
             }
-            return list;
+            return listproduct;
         }
         static List<Product> sortByCategoryName(Product[] product,Category[] categories)
         {
-            List<Product> listpro = new List<Product>();
+            List<Product> listproduct = new List<Product>();
             int temp;
             for (int i = 0; i < product.Length; i++)
             {
@@ -106,21 +106,22 @@ namespace Bai4
                 {
                     string categoryNameCurrent = GetCategoryById(product[j].categoryId, categories);
                     string categoryNamePost = GetCategoryById(product[i].categoryId, categories);
-                    if (categoryNamePost.CompareTo(categoryNameCurrent) > 0)
+                    if (categoryNamePost.CompareTo(categoryNameCurrent) > 0 && categoryNamePost != null)
                     {
-                        if (categoryNamePost == null)
-                            break;
+                        
                         temp = product[i].categoryId;
                         product[i].categoryId = product[j].categoryId;
                         product[j].categoryId = temp;
+
                     }
+                    
                 }
             }
             for (int i = 0; i < product.Length; i++)
             {
-                listpro.Add(product[i]);
+                listproduct.Add(product[i]);
             }
-            return listpro;
+            return listproduct;
         }
         static string GetCategoryById(int categoryId,Category[] categories)
         {
@@ -133,14 +134,25 @@ namespace Bai4
             }
             return null;
         }
-        static List<Product> mapProductByCategory(Product[] product, Category[] categories)
+        static ProductCategoryName[] mapProductByCategory(Product[] product, Category[] categories)
         {
-            List<Product> listpro = new List<Product>();
+            ProductCategoryName[] productCategoryName = new ProductCategoryName[product.Length];
             for(int i=0;i<product.Length;i++)
             {
-                listpro.Add(product[i]);
+                productCategoryName[i] = new ProductCategoryName();
+                productCategoryName[i].name = product[i].name;
+                productCategoryName[i].price = product[i].price;
+                productCategoryName[i].categoryId = product[i].categoryId;
+                productCategoryName[i].quality = product[i].quality;
+                for(int j=0;j<categories.Length;j++)
+                {
+                    if(productCategoryName[i].categoryId == categories[j].categoryId)
+                    {
+                        productCategoryName[i].categoryName = categories[j].name;
+                    }    
+                }    
             }
-            return listpro;
+            return productCategoryName;
         }
         static Product minbyPrice(Product[] product)
         {
@@ -196,7 +208,7 @@ namespace Bai4
             {
                 return month;
             }
-            else return calMonth(money,rate,month+1);
+            else return calMonth(money,rate,++month);
             
         }
         static int calMonthBasic(float money,float rate)
@@ -298,17 +310,17 @@ namespace Bai4
             List<Product> sortbyCategoryName = new List<Product>();
             sortbyCategoryName = sortByCategoryName(product, categories);
             Console.WriteLine("Sort By Category name");
-            for(int i=0;i<sortbyCategoryName.Count; i++)
+            for (int i = 0; i < sortbyCategoryName.Count; i++)
             {
-                Console.WriteLine(sortbyCategoryName[i].name+ " "+sortbyCategoryName[i].categoryId);
+                Console.WriteLine(sortbyCategoryName[i].name + " " + sortbyCategoryName[i].categoryId);
             }
             List<Product> sortByProName = new List<Product>();
-            sortByProName = mapProductByCategory(product, categories);
+            mapProductByCategory(product, categories);
             Console.WriteLine("Map By Category name");
-            for(int i=0;i<sortByProName.Count;i++)
+            for(int i=0;i<product.Length;i++)
             {
-                string getcategoryName = GetCategoryById(product[i].categoryId, categories);
-                Console.WriteLine(sortByProName[i].name+ " "+getcategoryName);
+                //string getcategoryName = GetCategoryById(product[i].categoryId, categories);
+                Console.WriteLine(mapProductByCategory(product, categories)[i].name+ " "+ mapProductByCategory(product, categories)[i].categoryName);
             }    
             Console.ReadKey();
             Product minPro = new Product();
